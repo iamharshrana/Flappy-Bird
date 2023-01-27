@@ -49,14 +49,25 @@ def score_display(game_state):
         score_surface = game_font.render(str(int(score)),True,(255,255,255))
         score_rect = score_surface.get_rect(center =(144,50))
         screen.blit(score_surface,score_rect)
-    if game_state == 'game_over':
-        score_surface = game_font.render(str(int(score)),True,(255,255,255))
-        score_rect = score_surface.get_rect(center =(144,50))
+    
+    if game_state ==     'game_over':
+        score_surface = game_font.render(f'Score: {int(score)}',True,(255,255,255))
+        score_rect = score_surface.get_rect(center =(144,90))
         screen.blit(score_surface,score_rect)
 
-        high_score_surface = game_font.render(str(int(high_score)),True,(255,255,255))
-        high_score_rect = high_score_surface.get_rect(center =(144,300))
-        screen.blit(high_score_surface,high_score_rect)        
+        high_score_surface = game_font.render(f'High Score: {int(high_score)}',True,(255,255,255))
+        high_score_rect = high_score_surface.get_rect(center =(144,420))
+        screen.blit(high_score_surface,high_score_rect)
+
+        text = game_font.render("created by Harsh rana", True, (255,255,255))
+        text_rect = text.get_rect(center = (144,40))
+        screen.blit(text,text_rect)
+              
+
+def update_score(score ,high_score):
+    if score > high_score:
+        high_score = score
+    return high_score
 
 pygame.init()
 screen = pygame.display.set_mode((288,512))
@@ -98,6 +109,8 @@ pipe_list = []
 SPAWNPIPE = pygame.USEREVENT
 pygame.time.set_timer(SPAWNPIPE,1200)
 pipe_height = [400,300,250,200]
+game_over_surface = pygame.image.load('assets/message.png').convert_alpha()
+game_over_rect = game_over_surface.get_rect(center =(144,256))
 
 while True:
     for event in pygame.event.get():
@@ -114,6 +127,7 @@ while True:
                 pipe_list.clear()
                 bird_rect.center = (34,24)
                 bird_movement = 0
+                score = 0
 
         if event.type == SPAWNPIPE:
             pipe_list.extend(create_pipe())
@@ -140,10 +154,13 @@ while True:
         pipe_list = move_pipes(pipe_list)
         draw_pipes(pipe_list)
 
-        score += 0.003
+        score += 0.005
         score_display('main_game')
     else:
+        screen.blit(game_over_surface,game_over_rect)
+        high_score = update_score(score ,high_score)
         score_display('game_over')
+        
 
     #Floor
     floor_x_pos += -1
